@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ลงทะเบียนทีม</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+</head>
+<body style="display:flex; align-items:center; justify-content:center;">
+    <div class="container" style="max-width: 450px; width:90%; padding:25px;">
+        <h1 style="font-size:1.8rem; margin-top:0;">📝 ลงทะเบียนทีม</h1>
+        
+        <div id="loginSection">
+            <div class="input-group">
+                <label class="input-label">ชื่อทีม</label>
+                <input type="text" id="teamName" class="student-input" placeholder="เช่น ทีมสายฟ้า">
+            </div>
+            <div class="input-group">
+                <label class="input-label">ระดับชั้น</label>
+                <input type="text" id="classRoom" class="student-input" placeholder="เช่น ม.4/1">
+            </div>
+            <label class="input-label">สมาชิกในทีม (ชื่อ - เลขที่)</label>
+            <div id="membersContainer"></div>
+            <button onclick="addMemberInput()" class="btn-main btn-add" style="margin-bottom:20px;">+ เพิ่มสมาชิก</button>
+            <button id="joinBtn" class="btn-main btn-primary">บันทึกและเริ่มเกม 🚀</button>
+        </div>
+
+        <div id="bellSection" style="display: none; text-align:center;">
+            <div style="background:#f1f2f6; padding:10px; border-radius:10px; margin-bottom:20px;">
+                <h2 id="welcomeText" style="color:var(--primary); margin:0;"></h2>
+                <p id="classText" style="color:#555; margin:5px 0 0 0;"></p>
+            </div>
+            <p id="statusText" style="font-size:1.2rem; color:#888;">รอสัญญาณจากครู...</p>
+            <button id="bellBtn" class="btn-bell">
+                <span>⚡</span><br><span>กด!</span>
+            </button>
+        </div>
+    </div>
+    <script src="script_student.js"></script>
+</body>
+</html>

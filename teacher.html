@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h1 style="margin:0;">🏝️ SURVIVOR <span style="font-size:0.6em; color:#555;">Control Center</span></h1>
+            <div class="control-bar">
+                <button onclick="openReport()" class="btn-main btn-report">📄 สรุปผล (PDF)</button>
+                <button id="resetQueueBtn" class="btn-main btn-reset">🔄 เริ่มข้อใหม่</button>
+                <button id="resetGameBtn" class="btn-main btn-clear">🗑️ ล้างเกม</button>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="panel">
+                <h2>⚡ ลำดับการกด (Queue)</h2>
+                <div id="countdownTimer" class="timer-box">5</div>
+                
+                <table class="queue-table">
+                    <thead>
+                        <tr><th width="15%">#</th><th width="45%">ทีม</th><th width="40%">จัดการ</th></tr>
+                    </thead>
+                    <tbody id="queueList">
+                        <tr><td colspan="3" style="text-align:center; padding:30px; color:#aaa;">รอสัญญาณ...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel">
+                <h2>🏆 คะแนนรวม (Score)</h2>
+                <ul id="scoreList" class="score-list">
+                    <li style="justify-content:center; color:#aaa;">ยังไม่มีคะแนน</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="reportModal" class="modal-overlay">
+        <div class="report-paper">
+            <div class="report-header">
+                <h3>รายงานสรุปผลกิจกรรมการเรียนรู้</h3>
+                <h2>Survivor: Island Crisis (แนวคิดเชิงคำนวณ)</h2>
+                <p>ชั้นมัธยมศึกษาปีที่ 4 | วันที่: <span id="reportDate"></span></p>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th width="10%">อันดับ</th>
+                        <th width="20%">ชื่อทีม</th>
+                        <th width="15%">ห้อง</th>
+                        <th width="40%">รายชื่อสมาชิก</th>
+                        <th width="15%">คะแนน</th>
+                    </tr>
+                </thead>
+                <tbody id="reportBody"></tbody>
+            </table>
+            <div class="no-print" style="margin-top:30px; text-align:center;">
+                <button onclick="window.print()" class="btn-main btn-success" style="background:#00b894;">🖨️ สั่งพิมพ์ / บันทึก PDF</button>
+                <button onclick="closeReport()" class="btn-main btn-danger" style="background:#d63031; margin-left:10px;">❌ ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bellSound" src="bell.mp3"></audio>
+    <script src="script_teacher.js"></script>
+</body>
+</html>

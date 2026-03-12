@@ -1,0 +1,65 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyBIzSM-7JFm5UKTlTIQ6lddgcQ7TEY3bng",
+  authDomain: "treequestproject.firebaseapp.com",
+  databaseURL: "https://treequestproject-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "treequestproject",
+  storageBucket: "treequestproject.firebasestorage.app",
+  messagingSenderId: "120187551632",
+  appId: "1:120187551632:web:fd02a953fb532ceefbbd15"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let myName = "";
+let isPressed = false;
+
+function addMemberInput() {
+    const div = document.createElement('div');
+    div.className = 'member-row';
+    div.innerHTML = `<input type="text" class="small-input member-name" placeholder="ชื่อ-สกุล"><input type="number" class="small-input member-no" placeholder="เลขที่">`;
+    document.getElementById('membersContainer').appendChild(div);
+}
+for(let i=0; i<5; i++) addMemberInput();
+
+document.getElementById('joinBtn').onclick = () => {
+    const team = document.getElementById('teamName').value.trim();
+    const room = document.getElementById('classRoom').value.trim();
+    const members = Array.from(document.querySelectorAll('.member-row')).map(row => ({
+        name: row.querySelector('.member-name').value.trim(),
+        no: row.querySelector('.member-no').value.trim()
+    })).filter(m => m.name);
+
+    if (team && room) {
+        myName = team;
+        db.ref('teamDetails/' + team).set({ classRoom: room, members: members });
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('bellSection').style.display = 'block';
+        document.getElementById('welcomeText').innerText = `ทีม: ${myName}`;
+        document.getElementById('classText').innerText = `ห้อง: ${room}`;
+        listenForReset();
+    } else alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+};
+
+document.getElementById('bellBtn').onclick = () => {
+    if (!isPressed) {
+        isPressed = true;
+        db.ref('queue/' + myName).set({ name: myName, timestamp: firebase.database.ServerValue.TIMESTAMP });
+        const btn = document.getElementById('bellBtn');
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+        document.getElementById('statusText').innerText = "ส่งคำตอบแล้ว! ⏳";
+    }
+};
+
+function listenForReset() {
+    db.ref('queue/' + myName).on('value', (snapshot) => {
+        if (!snapshot.exists()) {
+            isPressed = false;
+            const btn = document.getElementById('bellBtn');
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            document.getElementById('statusText').innerText = "พร้อมกด! 🔥";
+        }
+    });
+}
