@@ -10,8 +10,15 @@
 </head>
 <body>
     <div class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap: wrap; gap: 10px;">
             <h1 style="margin:0;">🏝️ SURVIVOR <span style="font-size:0.6em; color:#555;">Control Center</span></h1>
+            
+            <div style="background: #eee; padding: 10px 15px; border-radius: 10px; display: flex; align-items: center; gap: 10px;">
+                <span style="font-weight: bold; color: #333;">รหัสห้อง:</span>
+                <input type="text" id="roomPinInput" style="padding: 5px; width: 80px; border-radius: 5px; border: 1px solid #ccc; text-align: center; font-weight: bold;" value="123">
+                <button onclick="changeRoom()" class="btn-main" style="padding: 5px 10px; background: #6c5ce7; font-size: 0.8rem;">ยืนยัน</button>
+            </div>
+
             <div class="control-bar">
                 <button onclick="openReport()" class="btn-main btn-report">📄 สรุปผล (PDF)</button>
                 <button id="resetQueueBtn" class="btn-main btn-reset">🔄 เริ่มข้อใหม่</button>
@@ -23,22 +30,17 @@
             <div class="panel">
                 <h2>⚡ ลำดับการกด (Queue)</h2>
                 <div id="countdownTimer" class="timer-box">5</div>
-                
                 <table class="queue-table">
                     <thead>
                         <tr><th width="15%">#</th><th width="45%">ทีม</th><th width="40%">จัดการ</th></tr>
                     </thead>
-                    <tbody id="queueList">
-                        <tr><td colspan="3" style="text-align:center; padding:30px; color:#aaa;">รอสัญญาณ...</td></tr>
-                    </tbody>
+                    <tbody id="queueList"></tbody>
                 </table>
             </div>
 
             <div class="panel">
                 <h2>🏆 คะแนนรวม (Score)</h2>
-                <ul id="scoreList" class="score-list">
-                    <li style="justify-content:center; color:#aaa;">ยังไม่มีคะแนน</li>
-                </ul>
+                <ul id="scoreList" class="score-list"></ul>
             </div>
         </div>
     </div>
@@ -48,17 +50,11 @@
             <div class="report-header">
                 <h3>รายงานสรุปผลกิจกรรมการเรียนรู้</h3>
                 <h2>Survivor: Island Crisis (แนวคิดเชิงคำนวณ)</h2>
-                <p>ชั้นมัธยมศึกษาปีที่ 4 | วันที่: <span id="reportDate"></span></p>
+                <p>ชั้นมัธยมศึกษาปีที่ 4 | รหัสห้อง: <span id="reportRoom"></span> | วันที่: <span id="reportDate"></span></p>
             </div>
             <table class="report-table">
                 <thead>
-                    <tr>
-                        <th width="10%">อันดับ</th>
-                        <th width="20%">ชื่อทีม</th>
-                        <th width="15%">ห้อง</th>
-                        <th width="40%">รายชื่อสมาชิก</th>
-                        <th width="15%">คะแนน</th>
-                    </tr>
+                    <tr><th width="10%">อันดับ</th><th width="20%">ชื่อทีม</th><th width="15%">ห้อง</th><th width="40%">รายชื่อสมาชิก</th><th width="15%">คะแนน</th></tr>
                 </thead>
                 <tbody id="reportBody"></tbody>
             </table>
