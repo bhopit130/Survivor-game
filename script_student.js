@@ -11,18 +11,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ดึงชื่อทีมจาก LocalStorage (ถ้าเคยลงทะเบียนไว้แล้ว)
 let myName = localStorage.getItem('myTeam') || "";
+let myRoom = localStorage.getItem('myRoom') || "";
 let isPressed = false;
 
-// เช็คสถานะตอนเปิดเว็บ: ถ้าเคยมีชื่อแล้ว ให้ข้ามหน้าลงทะเบียนไปเลย
-if (myName) {
-    const room = localStorage.getItem('myRoom') || "";
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('bellSection').style.display = 'block';
-    document.getElementById('welcomeText').innerText = `ทีม: ${myName}`;
-    document.getElementById('classText').innerText = `ห้อง: ${room}`;
-    listenForReset();
+// ถ้ามีข้อมูลเดิมให้เข้าห้องเลย
+if (myName && myRoom) {
+    showBellSection();
 }
 
 function addMemberInput() {
@@ -33,42 +28,44 @@ function addMemberInput() {
 }
 for(let i=0; i<5; i++) addMemberInput();
 
-// ทำงานเมื่อกดปุ่ม "บันทึกและเริ่มเกม"
 document.getElementById('joinBtn').onclick = () => {
     const team = document.getElementById('teamName').value.trim();
     const room = document.getElementById('classRoom').value.trim();
+    const pin = document.getElementById('roomPin').value.trim();
     const members = Array.from(document.querySelectorAll('.member-row')).map(row => ({
         name: row.querySelector('.member-name').value.trim(),
         no: row.querySelector('.member-no').value.trim()
     })).filter(m => m.name);
 
-    if (team && room) {
+    if (team && room && pin) {
         myName = team;
-        
-        // 1. บันทึกข้อมูลลงมือถือของนักเรียน (กันเน็ตหลุด/เผลอปิดหน้าจอ)
+        myRoom = pin;
         localStorage.setItem('myTeam', team);
-        localStorage.setItem('myRoom', room);
+        localStorage.setItem('myRoom', pin);
+        localStorage.setItem('myClass', room);
 
-        // 2. ส่งข้อมูลสมาชิกลง Firebase
-        db.ref('teamDetails/' + team).set({ classRoom: room, members: members });
-        
-        // 3. กำหนดคะแนนให้เป็น 0 เพื่อให้ชื่อทีมไปโผล่ที่หน้าจอครูทันที
-        db.ref('scores/' + team).transaction((current) => current !== null ? current : 0);
+        // บันทึกข้อมูลแยกห้อง และตั้งคะแนนเริ่มต้นที่ 0 เพื่อให้ชื่อโผล่ฝั่งครู
+        db.ref(`rooms/${myRoom}/teamDetails/${myName}`).set({ classRoom: room, members: members });
+        db.ref(`rooms/${myRoom}/scores/${myName}`).transaction((current) => (current === null ? 0 : current));
 
-        // เปลี่ยนหน้าจอ
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('bellSection').style.display = 'block';
-        document.getElementById('welcomeText').innerText = `ทีม: ${myName}`;
-        document.getElementById('classText').innerText = `ห้อง: ${room}`;
-        listenForReset();
-    } else alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        showBellSection();
+    } else alert("กรุณากรอกข้อมูลให้ครบถ้วน รวมถึงรหัสห้อง");
 };
 
-// ปุ่มกดกริ่ง
+function showBellSection() {
+    const roomClass = localStorage.getItem('myClass') || "";
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('bellSection').style.display = 'block';
+    document.getElementById('welcomeText').innerText = `ทีม: ${myName}`;
+    document.getElementById('classText').innerText = `ห้อง: ${roomClass}`;
+    document.getElementById('roomDisplay').innerText = `ROOM PIN: ${myRoom}`;
+    listenForReset();
+}
+
 document.getElementById('bellBtn').onclick = () => {
     if (!isPressed) {
         isPressed = true;
-        db.ref('queue/' + myName).set({ name: myName, timestamp: firebase.database.ServerValue.TIMESTAMP });
+        db.ref(`rooms/${myRoom}/queue/${myName}`).set({ name: myName, timestamp: firebase.database.ServerValue.TIMESTAMP });
         const btn = document.getElementById('bellBtn');
         btn.disabled = true;
         btn.style.opacity = "0.5";
@@ -76,9 +73,8 @@ document.getElementById('bellBtn').onclick = () => {
     }
 };
 
-// รอฟังคำสั่งล้างคิวจากครู
 function listenForReset() {
-    db.ref('queue/' + myName).on('value', (snapshot) => {
+    db.ref(`rooms/${myRoom}/queue/${myName}`).on('value', (snapshot) => {
         if (!snapshot.exists()) {
             isPressed = false;
             const btn = document.getElementById('bellBtn');
@@ -89,11 +85,9 @@ function listenForReset() {
     });
 }
 
-// ปุ่มออกจากระบบ (เคลียร์ความจำแล้วรีเฟรชหน้าเว็บ)
 document.getElementById('logoutBtn').onclick = () => {
-    if(confirm("ต้องการเปลี่ยนทีม หรือออกจากระบบใช่หรือไม่?")) {
-        localStorage.removeItem('myTeam');
-        localStorage.removeItem('myRoom');
-        location.reload(); 
+    if(confirm("ต้องการออกจากห้องใช่หรือไม่?")) {
+        localStorage.clear();
+        location.reload();
     }
 };
