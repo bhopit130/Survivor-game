@@ -15,7 +15,7 @@ let myName = localStorage.getItem('myTeam') || "";
 let myRoom = localStorage.getItem('myRoom') || "";
 let isPressed = false;
 
-// ถ้ามีข้อมูลเดิมให้เข้าห้องเลย
+// ถ้ามีข้อมูลเดิม ให้ข้ามหน้าล็อคอินเข้าห้องเลย
 if (myName && myRoom) {
     showBellSection();
 }
@@ -44,12 +44,12 @@ document.getElementById('joinBtn').onclick = () => {
         localStorage.setItem('myRoom', pin);
         localStorage.setItem('myClass', room);
 
-        // บันทึกข้อมูลแยกห้อง และตั้งคะแนนเริ่มต้นที่ 0 เพื่อให้ชื่อโผล่ฝั่งครู
+        // บันทึกแยกห้อง และสร้างคะแนน 0 ทันทีให้ไปโผล่ฝั่งครู
         db.ref(`rooms/${myRoom}/teamDetails/${myName}`).set({ classRoom: room, members: members });
         db.ref(`rooms/${myRoom}/scores/${myName}`).transaction((current) => (current === null ? 0 : current));
 
         showBellSection();
-    } else alert("กรุณากรอกข้อมูลให้ครบถ้วน รวมถึงรหัสห้อง");
+    } else alert("กรุณากรอกข้อมูลให้ครบถ้วน รวมถึงรหัสห้อง 4 หลัก");
 };
 
 function showBellSection() {
@@ -57,8 +57,8 @@ function showBellSection() {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('bellSection').style.display = 'block';
     document.getElementById('welcomeText').innerText = `ทีม: ${myName}`;
-    document.getElementById('classText').innerText = `ห้อง: ${roomClass}`;
-    document.getElementById('roomDisplay').innerText = `ROOM PIN: ${myRoom}`;
+    document.getElementById('classText').innerText = `ชั้น: ${roomClass}`;
+    document.getElementById('roomDisplay').innerText = `🟢 ROOM PIN: ${myRoom}`;
     listenForReset();
 }
 
@@ -86,7 +86,7 @@ function listenForReset() {
 }
 
 document.getElementById('logoutBtn').onclick = () => {
-    if(confirm("ต้องการออกจากห้องใช่หรือไม่?")) {
+    if(confirm("ต้องการออกจากห้อง หรือ เปลี่ยนทีม ใช่หรือไม่?")) {
         localStorage.clear();
         location.reload();
     }
