@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 </head>
 <body style="display:flex; flex-direction: column; align-items:center; justify-content:center; min-height: 100vh;">
-    <div class="container" style="max-width: 450px; width:90%; padding:25px;">
+    <div class="container" style="max-width: 450px; width:90%; padding:25px; position: relative;">
         <h1 style="font-size:1.8rem; margin-top:0;">📝 ลงทะเบียนทีม</h1>
         
         <div id="loginSection">
@@ -41,7 +41,26 @@
             <button id="bellBtn" class="btn-bell">
                 <span>⚡</span><br><span>กด!</span>
             </button>
-            <button id="logoutBtn" style="background:none; border:none; color:#ff7675; text-decoration:underline; cursor:pointer; margin-top:20px; font-size:1rem;">🚪 ออกจากห้อง / เปลี่ยนทีม</button>
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+                <button onclick="document.getElementById('instructionModal').style.display='flex'" style="background:none; border:none; color:#0984e3; font-weight:bold; cursor:pointer; font-size:1rem;">❓ ดูกติกาการเล่น</button>
+                <button id="logoutBtn" style="background:none; border:none; color:#ff7675; text-decoration:underline; cursor:pointer; font-size:0.9rem;">🚪 ออกจากห้อง / เปลี่ยนทีม</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="instructionModal" class="modal-overlay">
+        <div style="background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 15px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h3 style="color: #6c5ce7; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; text-align:center;">🏝️ กติกา Survivor</h3>
+            <ol style="line-height: 1.6; font-size: 1rem; color: #333; padding-left: 20px;">
+                <li>ฟังโจทย์จากครูและช่วยกันคิด</li>
+                <li>รอหน้าจอนับถอยหลัง <span style="color:#ff7675; font-weight:bold;">3.. 2.. 1..</span></li>
+                <li>เมื่อปุ่มเปลี่ยนเป็นคำว่า <span style="color:#00b894; font-weight:bold;">"GO!"</span> ให้รีบกด</li>
+                <li>ทีมที่กดไวสุด จะได้สิทธิ์ตอบ</li>
+                <li>ตอบถูก <span style="color:#00b894; font-weight:bold;">+1</span> ตอบผิด <span style="color:#d63031; font-weight:bold;">-1</span></li>
+            </ol>
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="document.getElementById('instructionModal').style.display='none'" class="btn-main" style="background:#d63031; width: 100px;">ปิด</button>
+            </div>
         </div>
     </div>
 
