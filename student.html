@@ -14,6 +14,10 @@
         
         <div id="loginSection">
             <div class="input-group">
+                <label class="input-label">รหัสห้อง (Room PIN)</label>
+                <input type="text" id="roomPin" class="student-input" placeholder="กรอกรหัส 3 หลักจากครู" style="border-color: #6c5ce7; font-weight: bold; text-align: center;">
+            </div>
+            <div class="input-group">
                 <label class="input-label">ชื่อทีม</label>
                 <input type="text" id="teamName" class="student-input" placeholder="เช่น ทีมสายฟ้า">
             </div>
@@ -21,23 +25,23 @@
                 <label class="input-label">ระดับชั้น</label>
                 <input type="text" id="classRoom" class="student-input" placeholder="เช่น ม.4/1">
             </div>
-            <label class="input-label">สมาชิกในทีม (ชื่อ - เลขที่)</label>
+            <label class="input-label">สมาชิกในทีม</label>
             <div id="membersContainer"></div>
             <button onclick="addMemberInput()" class="btn-main btn-add" style="margin-bottom:20px;">+ เพิ่มสมาชิก</button>
             <button id="joinBtn" class="btn-main btn-primary">บันทึกและเริ่มเกม 🚀</button>
         </div>
 
         <div id="bellSection" style="display: none; text-align:center;">
-            <div style="background:#f1f2f6; padding:10px; border-radius:10px; margin-bottom:20px;">
+            <div style="background:#f1f2f6; padding:10px; border-radius:10px; margin-bottom:10px;">
                 <h2 id="welcomeText" style="color:var(--primary); margin:0;"></h2>
                 <p id="classText" style="color:#555; margin:5px 0 0 0;"></p>
+                <p id="roomDisplay" style="font-weight: bold; color: #6c5ce7; margin: 0; font-size: 0.8rem;"></p>
             </div>
             <p id="statusText" style="font-size:1.2rem; color:#888;">รอสัญญาณจากครู...</p>
             <button id="bellBtn" class="btn-bell">
                 <span>⚡</span><br><span>กด!</span>
             </button>
-            
-            <button id="logoutBtn" class="btn-main" style="background:transparent; color:#ff7675; border:1px solid #ff7675; margin-top:30px; font-size:1rem; width:100%;">🚪 เปลี่ยนทีม / ออกจากระบบ</button>
+            <button id="logoutBtn" style="background:none; border:none; color:#ff7675; text-decoration:underline; cursor:pointer; margin-top:20px;">ออกจากห้อง / เปลี่ยนทีม</button>
         </div>
     </div>
     <script src="script_student.js"></script>
