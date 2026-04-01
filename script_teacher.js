@@ -8,7 +8,6 @@ const firebaseConfig = {
   appId: "1:173614788791:web:e4779177a48814389f9d32"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
@@ -20,49 +19,60 @@ const timerEl = document.getElementById('countdownTimer');
 let currentScores = {};
 let currentTeamDetails = {};
 let timerInterval = null;
+let roomPin = document.getElementById('roomPinInput').value;
 
-// ดึงข้อมูลคะแนน
-db.ref('scores').on('value', (snapshot) => {
-    currentScores = snapshot.val() || {};
-    renderLeaderboard(currentScores);
-});
+// ฟังก์ชันเปลี่ยนห้อง
+window.changeRoom = () => {
+    roomPin = document.getElementById('roomPinInput').value.trim();
+    if (!roomPin) return alert("กรุณาระบุรหัสห้อง");
+    stopCountdown();
+    initListeners();
+    alert(`เข้าสู่ห้อง: ${roomPin}`);
+};
 
-// ดึงข้อมูลสมาชิก
-db.ref('teamDetails').on('value', (snapshot) => {
-    currentTeamDetails = snapshot.val() || {};
-});
+function initListeners() {
+    // ล้าง listener เก่า
+    db.ref(`rooms/${roomPin}/scores`).off();
+    db.ref(`rooms/${roomPin}/teamDetails`).off();
+    db.ref(`rooms/${roomPin}/queue`).off();
 
-// ติดตามลำดับการกด (Queue)
-db.ref('queue').orderByChild('timestamp').on('value', (snapshot) => {
-    queueList.innerHTML = '';
-    let index = 0;
-    
-    snapshot.forEach((child) => {
-        index++;
-        const entry = child.val();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><h1>${index}</h1></td>
-            <td><span style="font-size:1.2rem; font-weight:bold;">${entry.name}</span><br><small style="color:#888;">${new Date(entry.timestamp).toLocaleTimeString()}</small></td>
-            <td>
-                <button class="btn-score btn-plus" onclick="adjustScore('${entry.name}', 1)">+1</button>
-                <button class="btn-score btn-minus" onclick="adjustScore('${entry.name}', -1)">-1</button>
-            </td>
-        `;
-        queueList.appendChild(tr);
-
-        // ถ้าเป็นคนแรก ให้เริ่มจับเวลา
-        if (index === 1 && !timerInterval) {
-            startCountdown();
-            bellSound.play().catch(e => console.log(e));
-        }
+    // ดึงข้อมูลคะแนนแยกตามห้อง
+    db.ref(`rooms/${roomPin}/scores`).on('value', (snapshot) => {
+        currentScores = snapshot.val() || {};
+        renderLeaderboard(currentScores);
     });
 
-    if (index === 0) {
-        queueList.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px; color:#aaa;">รอสัญญาณ...</td></tr>`;
-        stopCountdown();
-    }
-});
+    db.ref(`rooms/${roomPin}/teamDetails`).on('value', (snapshot) => {
+        currentTeamDetails = snapshot.val() || {};
+    });
+
+    db.ref(`rooms/${roomPin}/queue`).orderByChild('timestamp').on('value', (snapshot) => {
+        queueList.innerHTML = '';
+        let index = 0;
+        snapshot.forEach((child) => {
+            index++;
+            const entry = child.val();
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><h1>${index}</h1></td>
+                <td><span style="font-size:1.2rem; font-weight:bold;">${entry.name}</span><br><small style="color:#888;">${new Date(entry.timestamp).toLocaleTimeString()}</small></td>
+                <td>
+                    <button class="btn-score btn-plus" onclick="adjustScore('${entry.name}', 1)">+1</button>
+                    <button class="btn-score btn-minus" onclick="adjustScore('${entry.name}', -1)">-1</button>
+                </td>
+            `;
+            queueList.appendChild(tr);
+            if (index === 1 && !timerInterval) {
+                startCountdown();
+                bellSound.play().catch(e => console.log(e));
+            }
+        });
+        if (index === 0) {
+            queueList.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px; color:#aaa;">รอสัญญาณ...</td></tr>`;
+            stopCountdown();
+        }
+    });
+}
 
 function startCountdown() {
     let timeLeft = 5;
@@ -97,21 +107,21 @@ function renderLeaderboard(scores) {
 }
 
 window.adjustScore = (name, amount) => {
-    db.ref('scores/' + name).transaction((current) => (current || 0) + amount);
-    db.ref('queue/' + name).remove();
+    db.ref(`rooms/${roomPin}/scores/${name}`).transaction((current) => (current || 0) + amount);
+    db.ref(`rooms/${roomPin}/queue/${name}`).remove();
     stopCountdown();
 };
 
-document.getElementById('resetQueueBtn').onclick = () => db.ref('queue').remove();
+document.getElementById('resetQueueBtn').onclick = () => db.ref(`rooms/${roomPin}/queue`).remove();
 
 document.getElementById('resetGameBtn').onclick = () => {
-    if(confirm("ล้างข้อมูลทั้งหมด?")) db.ref().remove();
+    if(confirm(`ล้างข้อมูลทั้งหมดของห้อง ${roomPin}?`)) db.ref(`rooms/${roomPin}`).remove();
 };
 
-// PDF Report Logic (เหมือนเดิม)
 window.openReport = () => {
     const tbody = document.getElementById('reportBody');
     document.getElementById('reportDate').innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('reportRoom').innerText = roomPin;
     tbody.innerHTML = '';
     Object.entries(currentScores).sort((a,b)=>b[1]-a[1]).forEach(([team, score], i) => {
         const d = currentTeamDetails[team] || { classRoom: '-', members: [] };
@@ -121,3 +131,6 @@ window.openReport = () => {
     document.getElementById('reportModal').style.display = 'flex';
 };
 window.closeReport = () => document.getElementById('reportModal').style.display = 'none';
+
+// เริ่มต้นเรียกใช้งาน
+initListeners();
