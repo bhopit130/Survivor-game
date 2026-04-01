@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ลงทะเบียนทีม</title>
+    <title>ลงทะเบียนทีม - Survivor</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 </head>
-<body style="display:flex; align-items:center; justify-content:center;">
+<body style="display:flex; flex-direction: column; align-items:center; justify-content:center; min-height: 100vh;">
     <div class="container" style="max-width: 450px; width:90%; padding:25px;">
         <h1 style="font-size:1.8rem; margin-top:0;">📝 ลงทะเบียนทีม</h1>
         
         <div id="loginSection">
             <div class="input-group">
-                <label class="input-label">รหัสห้อง (Room PIN)</label>
-                <input type="text" id="roomPin" class="student-input" placeholder="กรอกรหัส 3 หลักจากครู" style="border-color: #6c5ce7; font-weight: bold; text-align: center;">
+                <label class="input-label">รหัสห้อง (PIN จากหน้าจอครู)</label>
+                <input type="number" id="roomPin" class="student-input" placeholder="กรอกรหัส 4 หลัก" style="border-color: #00b894; font-weight: bold; text-align: center; font-size: 1.5rem; letter-spacing: 2px;">
             </div>
             <div class="input-group">
                 <label class="input-label">ชื่อทีม</label>
@@ -35,15 +35,20 @@
             <div style="background:#f1f2f6; padding:10px; border-radius:10px; margin-bottom:10px;">
                 <h2 id="welcomeText" style="color:var(--primary); margin:0;"></h2>
                 <p id="classText" style="color:#555; margin:5px 0 0 0;"></p>
-                <p id="roomDisplay" style="font-weight: bold; color: #6c5ce7; margin: 0; font-size: 0.8rem;"></p>
+                <p id="roomDisplay" style="font-weight: bold; color: #00b894; margin: 5px 0 0 0; font-size: 1rem; border-top: 1px solid #ccc; padding-top: 5px;"></p>
             </div>
             <p id="statusText" style="font-size:1.2rem; color:#888;">รอสัญญาณจากครู...</p>
             <button id="bellBtn" class="btn-bell">
                 <span>⚡</span><br><span>กด!</span>
             </button>
-            <button id="logoutBtn" style="background:none; border:none; color:#ff7675; text-decoration:underline; cursor:pointer; margin-top:20px;">ออกจากห้อง / เปลี่ยนทีม</button>
+            <button id="logoutBtn" style="background:none; border:none; color:#ff7675; text-decoration:underline; cursor:pointer; margin-top:20px; font-size:1rem;">🚪 ออกจากห้อง / เปลี่ยนทีม</button>
         </div>
     </div>
+
+    <div style="text-align: center; margin-top: 20px; color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 300;">
+        ผู้สร้าง: นายบพิธ มังคะลา ครู โรงเรียนดีบุกพังงาวิทยายน
+    </div>
+
     <script src="script_student.js"></script>
 </body>
 </html>
