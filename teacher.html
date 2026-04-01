@@ -20,6 +20,7 @@
             </div>
 
             <div class="control-bar">
+                <button onclick="document.getElementById('instructionModal').style.display='flex'" class="btn-main" style="background:#0984e3;">❓ วิธีเล่น</button>
                 <button onclick="openReport()" class="btn-main btn-report">📄 สรุปผล (PDF)</button>
                 <button id="resetQueueBtn" class="btn-main btn-reset">🔄 ล้างคิวคนกด</button>
                 <button id="resetGameBtn" class="btn-main btn-clear">🗑️ ล้างคะแนนห้องนี้</button>
@@ -32,7 +33,7 @@
                 <div id="countdownTimer" class="timer-box">5</div>
                 <table class="queue-table">
                     <thead>
-                        <tr><th width="15%">#</th><th width="45%">ทีม</th><th width="40%">จัดการ</th></tr>
+                        <tr><th width=\"15%\">#</th><th width=\"45%\">ทีม</th><th width=\"40%\">จัดการ</th></tr>
                     </thead>
                     <tbody id="queueList"></tbody>
                 </table>
@@ -41,6 +42,22 @@
             <div class="panel">
                 <h2>🏆 คะแนนรวม (Score)</h2>
                 <ul id="scoreList" class="score-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="instructionModal" class="modal-overlay">
+        <div style="background: white; width: 90%; max-width: 600px; padding: 30px; border-radius: 15px; text-align: left; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h2 style="color: #6c5ce7; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">🏝️ กติกาการเล่น Survivor: Island Crisis</h2>
+            <ol style="line-height: 1.8; font-size: 1.1rem; color: #333; padding-left: 20px;">
+                <li><b>ระดมสมอง:</b> ฟังโจทย์สถานการณ์เอาชีวิตรอดจากครู และช่วยกันคิดคำตอบภายในทีม</li>
+                <li><b>รอสัญญาณ:</b> เมื่อได้คำตอบแล้ว ให้รอครูกดปุ่ม "ล้างคิว" หน้าจอจะนับถอยหลัง <span style="color:#ff7675; font-weight:bold;">3.. 2.. 1..</span></li>
+                <li><b>กดให้ไว:</b> เมื่อปุ่มในมือถือเปลี่ยนเป็นสีเขียวและมีคำว่า <span style="color:#00b894; font-weight:bold;">"GO!"</span> ให้ตัวแทนกลุ่มรีบกดให้เร็วที่สุด</li>
+                <li><b>ตอบคำถาม:</b> ทีมที่กดได้อันดับที่ 1 จะได้สิทธิ์ตอบคำถาม</li>
+                <li><b>การให้คะแนน:</b> ตอบถูกรับ <span style="color:#00b894; font-weight:bold;">+1 คะแนน</span> ตอบผิดหัก <span style="color:#d63031; font-weight:bold;">-1 คะแนน</span></li>
+            </ol>
+            <div style="text-align: center; margin-top: 25px;">
+                <button onclick="document.getElementById('instructionModal').style.display='none'" class="btn-main" style="background:#d63031; width: 120px; font-size: 1.1rem;">เข้าใจแล้ว</button>
             </div>
         </div>
     </div>
@@ -54,7 +71,7 @@
             </div>
             <table class="report-table">
                 <thead>
-                    <tr><th width="10%">อันดับ</th><th width="20%">ชื่อทีม</th><th width="15%">ห้อง</th><th width="40%">รายชื่อสมาชิก</th><th width="15%">คะแนน</th></tr>
+                    <tr><th width=\"10%\">อันดับ</th><th width=\"20%\">ชื่อทีม</th><th width=\"15%\">ห้อง</th><th width=\"40%\">รายชื่อสมาชิก</th><th width=\"15%\">คะแนน</th></tr>
                 </thead>
                 <tbody id="reportBody"></tbody>
             </table>
