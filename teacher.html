@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard</title>
+    <title>Teacher Dashboard - Survivor</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -13,16 +13,16 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap: wrap; gap: 10px;">
             <h1 style="margin:0;">🏝️ SURVIVOR <span style="font-size:0.6em; color:#555;">Control Center</span></h1>
             
-            <div style="background: #eee; padding: 10px 15px; border-radius: 10px; display: flex; align-items: center; gap: 10px;">
-                <span style="font-weight: bold; color: #333;">รหัสห้อง:</span>
-                <input type="text" id="roomPinInput" style="padding: 5px; width: 80px; border-radius: 5px; border: 1px solid #ccc; text-align: center; font-weight: bold;" value="123">
-                <button onclick="changeRoom()" class="btn-main" style="padding: 5px 10px; background: #6c5ce7; font-size: 0.8rem;">ยืนยัน</button>
+            <div style="background: #eee; padding: 10px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px; border: 2px solid #ccc;">
+                <span style="font-weight: bold; color: #333;">รหัสห้อง (PIN):</span>
+                <span id="roomPinDisplay" style="font-size: 1.8rem; font-weight: 800; color: #6c5ce7; background: white; padding: 5px 20px; border-radius: 8px; border: 2px dashed #6c5ce7; letter-spacing: 2px;">----</span>
+                <button onclick="generateNewRoom()" class="btn-main" style="padding: 8px 15px; background: #00b894; font-size: 0.9rem;">🔄 สุ่มห้องใหม่</button>
             </div>
 
             <div class="control-bar">
                 <button onclick="openReport()" class="btn-main btn-report">📄 สรุปผล (PDF)</button>
-                <button id="resetQueueBtn" class="btn-main btn-reset">🔄 เริ่มข้อใหม่</button>
-                <button id="resetGameBtn" class="btn-main btn-clear">🗑️ ล้างเกม</button>
+                <button id="resetQueueBtn" class="btn-main btn-reset">🔄 ล้างคิวคนกด</button>
+                <button id="resetGameBtn" class="btn-main btn-clear">🗑️ ล้างคะแนนห้องนี้</button>
             </div>
         </div>
 
@@ -63,6 +63,10 @@
                 <button onclick="closeReport()" class="btn-main btn-danger" style="background:#d63031; margin-left:10px;">❌ ปิด</button>
             </div>
         </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: rgba(255,255,255,0.8); font-size: 0.95rem; font-weight: 300; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+        👨‍🏫 พัฒนาโดย: <b>นายบพิธ มังคะลา</b> ครู โรงเรียนดีบุกพังงาวิทยายน
     </div>
 
     <audio id="bellSound" src="bell.mp3"></audio>
