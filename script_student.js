@@ -1,9 +1,11 @@
-// วาง Config ของโปรเจกต์คุณครู
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  databaseURL: "https://YOUR_DATABASE_URL.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBPfA9hUsJ194I0nCS6KCbHqAvQiPLlh5A",
+  authDomain: "kindergarten-system-23604.firebaseapp.com",
+  databaseURL: "https://kindergarten-system-23604-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kindergarten-system-23604",
+  storageBucket: "kindergarten-system-23604.firebasestorage.app",
+  messagingSenderId: "173614788791",
+  appId: "1:173614788791:web:e4779177a48814389f9d32"
 };
 
 firebase.initializeApp(firebaseConfig);
