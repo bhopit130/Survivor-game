@@ -7,36 +7,30 @@ const firebaseConfig = {
   messagingSenderId: "173614788791",
   appId: "1:173614788791:web:e4779177a48814389f9d32"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const queueList = document.getElementById('queueList');
 const scoreList = document.getElementById('scoreList');
 const bellSound = document.getElementById('bellSound');
-const timerEl = document.getElementById('countdownTimer');
-
 let currentScores = {};
 let currentTeamDetails = {};
-let timerInterval = null;
+let countdownTimerId = null;
 let roomPin = "";
 
-// ฟังก์ชันสุ่มรหัสห้อง 4 หลัก (1000 - 9999)
+// ฟังก์ชันสุ่มรหัสห้อง 4 หลัก
 window.generateNewRoom = () => {
     roomPin = Math.floor(1000 + Math.random() * 9000).toString();
     document.getElementById('roomPinDisplay').innerText = roomPin;
-    stopCountdown();
     initListeners();
 };
 
-// สุ่มรหัสทันทีที่เปิดหน้าเว็บ
-generateNewRoom();
+generateNewRoom(); // ทำงานทันทีที่เปิดเว็บ
 
 function initListeners() {
-    // ล้าง Listener เก่าก่อนเผื่อมีการกดสุ่มห้องใหม่
     db.ref().off(); 
 
-    // ดึงข้อมูลคะแนนเฉพาะห้องนี้
+    // ดึงข้อมูลคะแนน
     db.ref(`rooms/${roomPin}/scores`).on('value', (snapshot) => {
         currentScores = snapshot.val() || {};
         renderLeaderboard(currentScores);
@@ -46,7 +40,7 @@ function initListeners() {
         currentTeamDetails = snapshot.val() || {};
     });
 
-    // ดึงคิวกดกริ่งเฉพาะห้องนี้
+    // ดึงคิวกดกริ่ง (เอาการจับเวลา 5 วิออกไปแล้ว)
     db.ref(`rooms/${roomPin}/queue`).orderByChild('timestamp').on('value', (snapshot) => {
         queueList.innerHTML = '';
         let index = 0;
@@ -63,38 +57,42 @@ function initListeners() {
                 </td>
             `;
             queueList.appendChild(tr);
-            if (index === 1 && !timerInterval) {
-                startCountdown();
+            // เล่นเสียงเมื่อมีคนกดคนแรก
+            if (index === 1) {
                 bellSound.play().catch(e => console.log(e));
             }
         });
         if (index === 0) {
-            queueList.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px; color:#aaa;">รอสัญญาณ...</td></tr>`;
-            stopCountdown();
+            queueList.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px; color:#aaa;">รอรับคำตอบ...</td></tr>`;
         }
     });
-}
 
-function startCountdown() {
-    let timeLeft = 5;
-    timerEl.innerText = timeLeft;
-    timerEl.classList.add('timer-active');
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        timerEl.innerText = timeLeft;
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            timerEl.innerText = "หมดเวลา!";
-            timerEl.style.backgroundColor = "#2d3436";
+    // ติดตามสถานะเกม (GameState) สำหรับแสดงเวลานับถอยหลังหน้าจอครู
+    db.ref(`rooms/${roomPin}/gameState`).on('value', (snapshot) => {
+        const state = snapshot.val();
+        const timerEl = document.getElementById('countdownTimer');
+        
+        if (!state) {
+            timerEl.style.display = 'none';
+            return;
         }
-    }, 1000);
-}
 
-function stopCountdown() {
-    if(timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
-    timerEl.classList.remove('timer-active');
-    timerEl.style.backgroundColor = "#ff7675";
+        if (state.startsWith('counting_')) {
+            const num = state.split('_')[1];
+            timerEl.style.display = 'flex';
+            timerEl.innerText = num;
+            timerEl.classList.add('timer-active');
+            timerEl.style.backgroundColor = "#ff7675"; // สีแดง
+        } else if (state === 'ready') {
+            timerEl.style.display = 'flex';
+            timerEl.innerText = "GO!";
+            timerEl.style.backgroundColor = "#00b894"; // สีเขียว
+            setTimeout(() => {
+                timerEl.classList.remove('timer-active');
+                timerEl.style.display = 'none';
+            }, 1500);
+        }
+    });
 }
 
 function renderLeaderboard(scores) {
@@ -107,15 +105,35 @@ function renderLeaderboard(scores) {
     });
 }
 
+// 📌 เมื่อครูให้คะแนน จะลบชื่อออกจากคิว แต่ไม่เปลี่ยน GameState (นักเรียนจะยังกดซ้ำไม่ได้)
 window.adjustScore = (name, amount) => {
     db.ref(`rooms/${roomPin}/scores/${name}`).transaction((current) => (current || 0) + amount);
     db.ref(`rooms/${roomPin}/queue/${name}`).remove();
-    stopCountdown();
 };
 
-document.getElementById('resetQueueBtn').onclick = () => db.ref(`rooms/${roomPin}/queue`).remove();
+// 📌 เมื่อครูกด "ล้างคิวคนกด" จะเริ่มนับถอยหลัง 3.. 2.. 1.. 
+document.getElementById('resetQueueBtn').onclick = () => {
+    // 1. ล้างคิวคนกดทั้งหมด
+    db.ref(`rooms/${roomPin}/queue`).remove();
+    
+    // 2. เคลียร์เวลานับถอยหลังเก่า (ถ้ามี)
+    if(countdownTimerId) clearInterval(countdownTimerId);
+    
+    // 3. เริ่มส่งสัญญาณนับถอยหลังไปที่ Firebase
+    let count = 3;
+    db.ref(`rooms/${roomPin}/gameState`).set('counting_' + count);
+    
+    countdownTimerId = setInterval(() => {
+        count--;
+        if(count > 0) {
+            db.ref(`rooms/${roomPin}/gameState`).set('counting_' + count);
+        } else {
+            clearInterval(countdownTimerId);
+            db.ref(`rooms/${roomPin}/gameState`).set('ready'); // พร้อมกด!
+        }
+    }, 1000);
+};
 
-// 🐛 แก้บัคแล้ว: ลบเฉพาะโฟลเดอร์ของ roomPin นี้เท่านั้น ไม่ลบกวนห้องอื่น!
 document.getElementById('resetGameBtn').onclick = () => {
     if(confirm(`ล้างคะแนนและข้อมูลทั้งหมดของห้อง [ ${roomPin} ] ใช่หรือไม่?`)) {
         db.ref(`rooms/${roomPin}`).remove();
