@@ -19,24 +19,24 @@ const timerEl = document.getElementById('countdownTimer');
 let currentScores = {};
 let currentTeamDetails = {};
 let timerInterval = null;
-let roomPin = document.getElementById('roomPinInput').value;
+let roomPin = "";
 
-// ฟังก์ชันเปลี่ยนห้อง
-window.changeRoom = () => {
-    roomPin = document.getElementById('roomPinInput').value.trim();
-    if (!roomPin) return alert("กรุณาระบุรหัสห้อง");
+// ฟังก์ชันสุ่มรหัสห้อง 4 หลัก (1000 - 9999)
+window.generateNewRoom = () => {
+    roomPin = Math.floor(1000 + Math.random() * 9000).toString();
+    document.getElementById('roomPinDisplay').innerText = roomPin;
     stopCountdown();
     initListeners();
-    alert(`เข้าสู่ห้อง: ${roomPin}`);
 };
 
-function initListeners() {
-    // ล้าง listener เก่า
-    db.ref(`rooms/${roomPin}/scores`).off();
-    db.ref(`rooms/${roomPin}/teamDetails`).off();
-    db.ref(`rooms/${roomPin}/queue`).off();
+// สุ่มรหัสทันทีที่เปิดหน้าเว็บ
+generateNewRoom();
 
-    // ดึงข้อมูลคะแนนแยกตามห้อง
+function initListeners() {
+    // ล้าง Listener เก่าก่อนเผื่อมีการกดสุ่มห้องใหม่
+    db.ref().off(); 
+
+    // ดึงข้อมูลคะแนนเฉพาะห้องนี้
     db.ref(`rooms/${roomPin}/scores`).on('value', (snapshot) => {
         currentScores = snapshot.val() || {};
         renderLeaderboard(currentScores);
@@ -46,6 +46,7 @@ function initListeners() {
         currentTeamDetails = snapshot.val() || {};
     });
 
+    // ดึงคิวกดกริ่งเฉพาะห้องนี้
     db.ref(`rooms/${roomPin}/queue`).orderByChild('timestamp').on('value', (snapshot) => {
         queueList.innerHTML = '';
         let index = 0;
@@ -114,8 +115,11 @@ window.adjustScore = (name, amount) => {
 
 document.getElementById('resetQueueBtn').onclick = () => db.ref(`rooms/${roomPin}/queue`).remove();
 
+// 🐛 แก้บัคแล้ว: ลบเฉพาะโฟลเดอร์ของ roomPin นี้เท่านั้น ไม่ลบกวนห้องอื่น!
 document.getElementById('resetGameBtn').onclick = () => {
-    if(confirm(`ล้างข้อมูลทั้งหมดของห้อง ${roomPin}?`)) db.ref(`rooms/${roomPin}`).remove();
+    if(confirm(`ล้างคะแนนและข้อมูลทั้งหมดของห้อง [ ${roomPin} ] ใช่หรือไม่?`)) {
+        db.ref(`rooms/${roomPin}`).remove();
+    }
 };
 
 window.openReport = () => {
@@ -131,6 +135,3 @@ window.openReport = () => {
     document.getElementById('reportModal').style.display = 'flex';
 };
 window.closeReport = () => document.getElementById('reportModal').style.display = 'none';
-
-// เริ่มต้นเรียกใช้งาน
-initListeners();
